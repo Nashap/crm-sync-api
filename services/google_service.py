@@ -1,16 +1,24 @@
+import requests
+
 def fetch_google_data():
-    # Mock data (since real GA4 needs OAuth)
-    return [
-        {
-            "campaign": "Google Campaign 1",
-            "impressions": 1000,
-            "clicks": 120,
-            "cost": 45.5
-        },
-        {
-            "campaign": "Google Campaign 2",
-            "impressions": 2000,
-            "clicks": 300,
-            "cost": 80.0
-        }
-    ]
+    try:
+        url = "https://dummyjson.com/products"  
+
+        response = requests.get(url)
+        response.raise_for_status()
+
+        data = response.json().get("products", [])
+
+        result = []
+        for item in data[:5]:
+            result.append({
+                "campaign": item["title"],
+                "impressions": 1000,
+                "clicks": 100,
+                "cost": 50
+            })
+
+        return result
+
+    except Exception as e:
+        return {"error": str(e)}

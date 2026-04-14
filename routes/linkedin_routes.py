@@ -7,6 +7,7 @@ from models import Campaign
 
 router = APIRouter()
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -15,9 +16,12 @@ def get_db():
         db.close()
 
 
-@router.get("/sync/linkedin")
+@router.post("/sync/linkedin")
 def sync_linkedin(db: Session = Depends(get_db)):
     raw = fetch_linkedin_campaigns()
+
+    if "error" in raw:
+        return {"status": "failed", "message": raw["error"]}
 
     for c in raw.get("elements", []):
         norm = normalize_linkedin({
@@ -27,8 +31,7 @@ def sync_linkedin(db: Session = Depends(get_db)):
             "costInLocalCurrency": c.get("costInLocalCurrency"),
         })
 
-        campaign = Campaign(**norm)
-        db.add(campaign)
+        db.add(Campaign(**norm))
 
     db.commit()
     return {"status": "LinkedIn synced"}

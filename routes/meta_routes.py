@@ -7,6 +7,7 @@ from models import Campaign
 
 router = APIRouter()
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -15,9 +16,12 @@ def get_db():
         db.close()
 
 
-@router.get("/sync/meta")
+@router.post("/sync/meta")
 def sync_meta(db: Session = Depends(get_db)):
     raw = fetch_meta_campaigns()
+
+    if "error" in raw:
+        return {"status": "failed", "message": raw["error"]}
 
     for c in raw.get("data", []):
         insights = c.get("insights", {}).get("data", [{}])[0]
@@ -29,8 +33,7 @@ def sync_meta(db: Session = Depends(get_db)):
             "spend": insights.get("spend"),
         })
 
-        campaign = Campaign(**norm)
-        db.add(campaign)
+        db.add(Campaign(**norm))
 
     db.commit()
     return {"status": "Meta synced"}
