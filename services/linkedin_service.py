@@ -15,10 +15,10 @@ def fetch_linkedin_campaigns():
             "Authorization": f"Bearer {LINKEDIN_TOKEN}"
         }
 
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
+        res = requests.get(url, headers=headers)
+        res.raise_for_status()
 
-        return response.json()
+        return res.json()
 
     except Exception as e:
         return {"error": str(e)}

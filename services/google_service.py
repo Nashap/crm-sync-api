@@ -1,24 +1,30 @@
+import os
+from dotenv import load_dotenv
 import requests
+
+load_dotenv()
+
+GOOGLE_TOKEN = os.getenv("GOOGLE_TOKEN")
+GOOGLE_CUSTOMER_ID = os.getenv("GOOGLE_CUSTOMER_ID")
+
 
 def fetch_google_data():
     try:
-        url = "https://dummyjson.com/products"  
+        url = f"https://googleads.googleapis.com/v14/customers/{GOOGLE_CUSTOMER_ID}/googleAds:search"
 
-        response = requests.get(url)
-        response.raise_for_status()
+        headers = {
+            "Authorization": f"Bearer {GOOGLE_TOKEN}",
+            "Content-Type": "application/json"
+        }
 
-        data = response.json().get("products", [])
+        query = {
+            "query": "SELECT campaign.name, metrics.impressions, metrics.clicks, metrics.cost_micros FROM campaign"
+        }
 
-        result = []
-        for item in data[:5]:
-            result.append({
-                "campaign": item["title"],
-                "impressions": 1000,
-                "clicks": 100,
-                "cost": 50
-            })
+        res = requests.post(url, headers=headers, json=query)
+        res.raise_for_status()
 
-        return result
+        return res.json()
 
     except Exception as e:
         return {"error": str(e)}

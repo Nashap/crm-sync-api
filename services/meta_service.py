@@ -5,7 +5,7 @@ import requests
 load_dotenv()
 
 META_TOKEN = os.getenv("META_TOKEN")
-AD_ACCOUNT_ID = "act_xxxxx"
+AD_ACCOUNT_ID = os.getenv("AD_ACCOUNT_ID")
 
 
 def fetch_meta_campaigns():
@@ -17,10 +17,10 @@ def fetch_meta_campaigns():
             "fields": "name,insights{impressions,clicks,spend}"
         }
 
-        response = requests.get(url, params=params)
-        response.raise_for_status()
+        res = requests.get(url, params=params)
+        res.raise_for_status()
 
-        return response.json()
+        return res.json()
 
     except Exception as e:
         return {"error": str(e)}

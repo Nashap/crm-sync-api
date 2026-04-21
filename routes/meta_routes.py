@@ -21,7 +21,7 @@ def sync_meta(db: Session = Depends(get_db)):
     raw = fetch_meta_campaigns()
 
     if "error" in raw:
-        return {"status": "failed", "message": raw["error"]}
+        return raw
 
     for c in raw.get("data", []):
         insights = c.get("insights", {}).get("data", [{}])[0]

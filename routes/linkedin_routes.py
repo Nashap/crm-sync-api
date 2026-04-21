@@ -21,16 +21,10 @@ def sync_linkedin(db: Session = Depends(get_db)):
     raw = fetch_linkedin_campaigns()
 
     if "error" in raw:
-        return {"status": "failed", "message": raw["error"]}
+        return raw
 
     for c in raw.get("elements", []):
-        norm = normalize_linkedin({
-            "name": c.get("name"),
-            "impressions": c.get("impressions"),
-            "clicks": c.get("clicks"),
-            "costInLocalCurrency": c.get("costInLocalCurrency"),
-        })
-
+        norm = normalize_linkedin(c)
         db.add(Campaign(**norm))
 
     db.commit()
